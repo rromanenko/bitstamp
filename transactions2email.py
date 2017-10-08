@@ -22,7 +22,7 @@ from pprint import pprint
 from time import time
 import hmac
 import hashlib
-import config
+from bitstamp_config import *
 
 #import for SMTP
 import smtplib

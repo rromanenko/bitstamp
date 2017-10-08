@@ -14,7 +14,7 @@ from pprint import pprint
 from time import time
 import hmac
 import hashlib
-import config
+from bitstamp_config import *
 
 nonce = str(int(time()))
 message = nonce + account_id + key

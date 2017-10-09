@@ -11,13 +11,13 @@ Created on Mon Feb 27 01:38:57 2017
 
 import requests
 from pprint import pprint
-from time import time
+from time import time, ctime
 import hmac
 import hashlib
 from bitstamp_config import *
 
 nonce = str(int(time()))
-message = nonce + account_id + key
+message = nonce + account_id + key+'df'
 
 signature = hmac.new(
      bytearray(secret,'utf8'),
@@ -36,6 +36,15 @@ for i in ticker_daily:
 # getting my account balance
 p = {"key" : key, 'signature': signature, 'nonce': nonce}
 balance = requests.post("https://www.bitstamp.net/api/v2/balance/", data = p).json()
+
+try:
+    if balance['status'] == 'error':
+        log_file = open("logfile.log", "a")
+        log_file.write('\n\n'+ctime()+'\n')
+        log_file.write(''+str(balance)+'\n\n')
+        log_file.close()
+except KeyError:
+    pass
 
 #reduce balance details to only needed ones
 for i in balance:

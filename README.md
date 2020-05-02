@@ -1,2 +1,3 @@
 # bitstamp
-Scripts for accessing bitstamp
+
+Check the balance at Bitstamp

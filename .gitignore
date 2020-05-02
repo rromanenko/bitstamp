@@ -1,3 +1,5 @@
 bitstamp_config.py
 .DS*
 __pycache__
+*.txt
+*.log

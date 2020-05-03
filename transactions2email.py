@@ -27,24 +27,49 @@ from bitstamp_config import *
 #import for SMTP
 import smtplib
 
+def send_email(message):
+    """ Send an email to details from config file with a passed message """
+
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    #server.ehlo()
+    server.starttls()
+
+    # Email details in config file
+    server.login(from_email, from_email_pass)
+
+    msg = "\r\n".join([
+        "From: " + from_email,
+        "To: " + to_email,
+        "Subject: BTC today",
+        "",
+        message
+        ])
+
+    server.sendmail(from_email, to_email, msg)
+    server.quit()
+
 nonce = str(int(time()))
 message = nonce + account_id + key
 
 signature = hmac.new(
-     b'0KLRyMNqvGcjlso2aisnlxJPgqpdoKhW',
+     bytearray(secret,'utf8'),
      msg=message.encode("UTF-8"),
      digestmod=hashlib.sha256).hexdigest().upper()
 
 # get 10 last transactions in desc order
-p = {"key" : key, 'signature': signature, 'nonce': nonce, 'offset':0, 'limit':10, 'sort':'desc'}
-transaction_list = requests.post("https://www.bitstamp.net/api/v2/user_transactions/btcusd/", data = p).json()
+payload = {"key" : key, 'signature': signature, 'nonce': nonce, 'offset':0, 'limit':10, 'sort':'desc'}
+transaction_list = requests.post("https://www.bitstamp.net/api/v2/user_transactions/btcusd/", data = payload).json()
 
 # timepoint.txt file contains the date and time of the last transaction
 # we open and read timepoint from that file
-timepoint_file = open("timepoint.txt", "r")
-timepoint_str = timepoint_file.readline().strip()
-timepoint_dt = datetime.datetime.strptime(timepoint_str, '%Y-%m-%d %H:%M:%S')
-timepoint_file.close()
+try:
+    timepoint_file = open("/Users/romanromanenko/Downloads/python/bitstamp/timepoint.txt", "r")
+    timepoint_str = timepoint_file.readline().strip()
+    timepoint_dt = datetime.datetime.strptime(timepoint_str, '%Y-%m-%d %H:%M:%S')
+    timepoint_file.close()
+except FileNotFoundError:
+    send_email("File timepoint.txt not found!")
+    exit()
 
 # then we scan last 10 transactions and if they happened after timepoint, we save them
 bitstamp_output = []
@@ -62,25 +87,5 @@ if bitstamp_output:
     timepoint_file.write(transaction_list[0]['datetime'])
     timepoint_file.close()
 
-    # format resulted json and convert to str before sending
-    bitstamp_output_str = str(json.dumps(bitstamp_output, sort_keys=True, indent=4))
-
-    # send an email with all details
-    server = smtplib.SMTP('smtp.gmail.com', 587)
-    #server.ehlo()
-    server.starttls()
-
-    server.login(from_email, from_email_pass)
-
-    msg = "\r\n".join([
-            "From: " + from_email,
-            "To: " + to_email,
-            "Subject: BTC transactions today",
-            "",
-            bitstamp_output_str
-            ])
-
-    
-    server.sendmail(from_email, to_email, msg)
-
-    server.quit()
+    # format resulted json, convert to str and send
+    send_email(str(json.dumps(bitstamp_output, sort_keys=True, indent=4)))

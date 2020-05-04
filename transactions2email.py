@@ -64,12 +64,16 @@ transaction_list = requests.post("https://www.bitstamp.net/api/v2/user_transacti
 # we open and read timepoint from that file
 try:
     timepoint_file = open("/Users/romanromanenko/Downloads/python/bitstamp/timepoint.txt", "r")
-    timepoint_str = timepoint_file.readline().strip()
-    timepoint_dt = datetime.datetime.strptime(timepoint_str, '%Y-%m-%d %H:%M:%S.%f')
-    timepoint_file.close()
 except FileNotFoundError:
-    send_email("File timepoint.txt not found!")
-    exit()
+    try:
+        timepoint_file = open("/var/www/python/timepoint.txt", "r")
+    except FileNotFoundError:
+        send_email("File timepoint.txt not found!")
+        exit()
+
+timepoint_str = timepoint_file.readline().strip()
+timepoint_dt = datetime.datetime.strptime(timepoint_str, '%Y-%m-%d %H:%M:%S.%f')
+timepoint_file.close()
 
 # then we scan last 10 transactions and if they happened after timepoint, we save them
 bitstamp_output = []

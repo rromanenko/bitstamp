@@ -65,7 +65,7 @@ transaction_list = requests.post("https://www.bitstamp.net/api/v2/user_transacti
 try:
     timepoint_file = open("/Users/romanromanenko/Downloads/python/bitstamp/timepoint.txt", "r")
     timepoint_str = timepoint_file.readline().strip()
-    timepoint_dt = datetime.datetime.strptime(timepoint_str, '%Y-%m-%d %H:%M:%S')
+    timepoint_dt = datetime.datetime.strptime(timepoint_str, '%Y-%m-%d %H:%M:%S.%f')
     timepoint_file.close()
 except FileNotFoundError:
     send_email("File timepoint.txt not found!")
@@ -75,7 +75,7 @@ except FileNotFoundError:
 bitstamp_output = []
 for i in range(len(transaction_list)):
     transaction = {}
-    if datetime.datetime.strptime(transaction_list[i]['datetime'], '%Y-%m-%d %H:%M:%S') > timepoint_dt:
+    if datetime.datetime.strptime(transaction_list[i]['datetime'], '%Y-%m-%d %H:%M:%S.%f') > timepoint_dt:
         for j in transaction_list[i]:
                 if j in ('btc', 'btc_usd', 'datetime', 'fee', 'usd'):
                     transaction[j] = transaction_list[i][j]

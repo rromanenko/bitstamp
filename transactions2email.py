@@ -66,7 +66,7 @@ try:
     timepoint_file = open("/Users/romanromanenko/Downloads/python/bitstamp/timepoint.txt", "r")
 except FileNotFoundError:
     try:
-        timepoint_file = open("/var/www/python/timepoint.txt", "r")
+        timepoint_file = open("/var/www/python/bitstamp/timepoint.txt", "r")
     except FileNotFoundError:
         send_email("File timepoint.txt not found!")
         exit()

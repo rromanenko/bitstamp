@@ -24,7 +24,7 @@ def send_email(message):
     """ Send an email to details from config file with a passed message """
 
     server = smtplib.SMTP('smtp.gmail.com', 587)
-    #server.ehlo()
+    # server.ehlo()
     server.starttls()
 
     # Email details in config file
